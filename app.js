@@ -144,11 +144,16 @@ let DinoFactory = {
     }
   },
   removeForm: function (form) {
-    form.parentNode.removeChild(form);
+    form.style.display = "none";
   },
-  buildTiles: function () {
+  showForm: function (form) {
+    form.style.display = "block";
+  },
+  removeGrid: function (grid) {
+    grid.parentNode.removeChild(grid);
+  },
+  buildTiles: function (form, grid) {
     const human = Human.getHuman();
-    const grid = document.getElementById("grid");
     this.dinoObjectsArr.splice(4, 0, human); // insert human in the middle
     this.dinoObjectsArr.forEach(function (dino) {
       let div = document.createElement("div");
@@ -175,6 +180,23 @@ let DinoFactory = {
       div.appendChild(textdiv);
       div.appendChild(img);
       grid.appendChild(div);
+    });
+
+    const navigation = document.getElementById("navigation");
+    const button = document.createElement("button");
+    button.setAttribute("id", "new-input");
+    button.innerText = "Play again";
+    navigation.appendChild(button);
+    const newInput = document.getElementById("new-input");
+    newInput.addEventListener("click", function (e) {
+      DinoFactory.showForm(form);
+      // TODO external Form object that handles the behaviour
+      form.reset();
+      document.getElementById("form-error").innerText = "";
+      navigation.removeChild(button);
+      while (grid.firstChild) {
+        grid.removeChild(grid.lastChild);
+      }
     });
   },
 };
@@ -232,11 +254,11 @@ let Human = (function () {
  * @description function that init the loading of json, build dinos, remove the form and build the tiles
  * @param form
  */
-function startOutput(form) {
+function startOutput(form, grid) {
   fetchDinoData().then(function (resp) {
     DinoFactory.buildDinoObjects(resp);
     DinoFactory.removeForm(form);
-    DinoFactory.buildTiles();
+    DinoFactory.buildTiles(form, grid);
   });
 }
 
@@ -245,6 +267,7 @@ function startOutput(form) {
  */
 (function () {
   const form = document.getElementById("dino-compare");
+  const grid = document.getElementById("grid");
   const feet = document.getElementById("feet");
   const inches = document.getElementById("inches");
   const message = document.getElementById("form-error");
@@ -263,11 +286,13 @@ function startOutput(form) {
         "<p style='color:#00aa00;'>If you want to set feet delete the inches input</p>";
     } else message.innerHTML = "";
   };
+
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     if (Human.validateData(e)) {
       Human.setHuman();
-      startOutput(form);
+      console.log(grid);
+      startOutput(form, grid);
     }
     return false;
   });

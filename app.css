@@ -167,6 +167,10 @@ select {
     cursor: pointer;
 }
 
+#new-input {
+    margin:1rem;
+    display: inline-block;
+}
 /* Footer */
 .fine-print {
     display: block;
