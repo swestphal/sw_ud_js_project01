@@ -149,8 +149,27 @@ let DinoFactory = {
   showForm: function (form) {
     form.style.display = "block";
   },
-  removeGrid: function (grid) {
-    grid.parentNode.removeChild(grid);
+  cleanScreen: function (form, grid, navigation) {
+    while (grid.firstChild) {
+      grid.removeChild(grid.lastChild);
+    }
+    form.reset();
+    document.getElementById("form-error").innerText = "";
+    while (navigation.firstChild) {
+      navigation.removeChild(navigation.lastChild);
+    }
+  },
+  addNewButton: function (form, grid) {
+    const navigation = document.getElementById("navigation");
+    const button = document.createElement("button");
+    button.setAttribute("id", "new-input");
+    button.innerText = "Play again";
+    navigation.appendChild(button);
+    const newInput = document.getElementById("new-input");
+    newInput.addEventListener("click", function (e) {
+      DinoFactory.showForm(form);
+      DinoFactory.cleanScreen(form, grid, navigation);
+    });
   },
   buildTiles: function (form, grid) {
     const human = Human.getHuman();
@@ -182,22 +201,7 @@ let DinoFactory = {
       grid.appendChild(div);
     });
 
-    const navigation = document.getElementById("navigation");
-    const button = document.createElement("button");
-    button.setAttribute("id", "new-input");
-    button.innerText = "Play again";
-    navigation.appendChild(button);
-    const newInput = document.getElementById("new-input");
-    newInput.addEventListener("click", function (e) {
-      DinoFactory.showForm(form);
-      // TODO external Form object that handles the behaviour
-      form.reset();
-      document.getElementById("form-error").innerText = "";
-      navigation.removeChild(button);
-      while (grid.firstChild) {
-        grid.removeChild(grid.lastChild);
-      }
-    });
+    this.addNewButton(form, grid);
   },
 };
 
@@ -291,7 +295,6 @@ function startOutput(form, grid) {
     e.preventDefault();
     if (Human.validateData(e)) {
       Human.setHuman();
-      console.log(grid);
       startOutput(form, grid);
     }
     return false;
